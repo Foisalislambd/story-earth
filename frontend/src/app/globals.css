@@ -54,61 +54,105 @@
     border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 }
 
 @layer components {
   .container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 80rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
   }
   
   .prose {
-    @apply text-foreground;
+    color: hsl(var(--foreground));
   }
   
   .prose h1 {
-    @apply text-4xl font-bold mb-6;
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
   }
   
   .prose h2 {
-    @apply text-3xl font-semibold mb-4 mt-8;
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
   }
   
   .prose h3 {
-    @apply text-2xl font-semibold mb-3 mt-6;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
   }
   
   .prose p {
-    @apply mb-4 leading-relaxed;
+    margin-bottom: 1rem;
+    line-height: 1.625;
   }
   
   .prose ul,
   .prose ol {
-    @apply mb-4 pl-6;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
   }
   
   .prose li {
-    @apply mb-1;
+    margin-bottom: 0.25rem;
   }
   
   .prose a {
-    @apply text-primary hover:underline;
+    color: hsl(var(--primary));
+  }
+  
+  .prose a:hover {
+    text-decoration: underline;
   }
   
   .prose blockquote {
-    @apply border-l-4 border-muted-foreground pl-4 italic text-muted-foreground;
+    border-left: 4px solid hsl(var(--muted-foreground));
+    padding-left: 1rem;
+    font-style: italic;
+    color: hsl(var(--muted-foreground));
   }
   
   .prose code {
-    @apply bg-muted px-1 py-0.5 rounded text-sm font-mono;
+    background-color: hsl(var(--muted));
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
   }
   
   .prose pre {
-    @apply bg-muted p-4 rounded-lg overflow-x-auto;
+    background-color: hsl(var(--muted));
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
   }
   
   .prose pre code {
-    @apply bg-transparent p-0;
+    background-color: transparent;
+    padding: 0;
   }
 }
