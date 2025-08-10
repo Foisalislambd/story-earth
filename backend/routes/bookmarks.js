@@ -2,6 +2,7 @@ const express = require('express');
 const { Op } = require('sequelize');
 const { Bookmark, Story, User } = require('../models');
 const auth = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -60,7 +61,7 @@ router.get('/', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching bookmarks:', error);
+    logger.error('Error fetching bookmarks:', error);
     res.status(500).json({ message: 'Error fetching bookmarks' });
   }
 });
@@ -92,7 +93,7 @@ router.get('/collections', auth, async (req, res) => {
 
     res.json({ collections: collectionsWithCounts });
   } catch (error) {
-    console.error('Error fetching bookmark collections:', error);
+    logger.error('Error fetching bookmark collections:', error);
     res.status(500).json({ message: 'Error fetching bookmark collections' });
   }
 });
@@ -149,7 +150,7 @@ router.post('/', auth, async (req, res) => {
 
     res.status(201).json(bookmarkWithStory);
   } catch (error) {
-    console.error('Error creating bookmark:', error);
+    logger.error('Error creating bookmark:', error);
     res.status(500).json({ message: 'Error creating bookmark' });
   }
 });
@@ -194,7 +195,7 @@ router.put('/:id', auth, async (req, res) => {
 
     res.json(updatedBookmark);
   } catch (error) {
-    console.error('Error updating bookmark:', error);
+    logger.error('Error updating bookmark:', error);
     res.status(500).json({ message: 'Error updating bookmark' });
   }
 });
@@ -221,7 +222,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.json({ message: 'Bookmark removed successfully' });
   } catch (error) {
-    console.error('Error removing bookmark:', error);
+    logger.error('Error removing bookmark:', error);
     res.status(500).json({ message: 'Error removing bookmark' });
   }
 });
@@ -247,7 +248,7 @@ router.delete('/story/:storyId', auth, async (req, res) => {
 
     res.json({ message: 'Bookmark removed successfully' });
   } catch (error) {
-    console.error('Error removing bookmark:', error);
+    logger.error('Error removing bookmark:', error);
     res.status(500).json({ message: 'Error removing bookmark' });
   }
 });
@@ -264,7 +265,7 @@ router.get('/check/:storyId', auth, async (req, res) => {
 
     res.json({ isBookmarked: !!bookmark, bookmark });
   } catch (error) {
-    console.error('Error checking bookmark:', error);
+    logger.error('Error checking bookmark:', error);
     res.status(500).json({ message: 'Error checking bookmark' });
   }
 });

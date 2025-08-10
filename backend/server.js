@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+const logger = require('./utils/logger');
+
 const { connectDB } = require('./config/database');
 const models = require('./models');
 const authRoutes = require('./routes/auth');
@@ -67,7 +69,7 @@ app.get('/api/health', (req, res) => {
 
 // Error handling middleware
 app.use((error, req, res, next) => {
-  console.error(error);
+  logger.error('Server error:', error);
   res.status(error.status || 500).json({
     error: {
       message: error.message || 'Internal Server Error'
@@ -87,13 +89,18 @@ app.use('*', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log('Available API routes:');
-  console.log('  - /api/auth (Authentication)');
-  console.log('  - /api/stories (Story management)');
-  console.log('  - /api/bookmarks (Bookmark functionality)');
-  console.log('  - /api/shares (Share tracking)');
-  console.log('  - /api/series (Story series)');
-  console.log('  - /api/health (Health check)');
+  // Only show startup logs in development
+  if (process.env.NODE_ENV === 'development') {
+    logger.log(`Server is running on port ${PORT}`);
+    logger.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    logger.log('Available API routes:');
+    logger.log('  - /api/auth (Authentication)');
+    logger.log('  - /api/stories (Story management)');
+    logger.log('  - /api/bookmarks (Bookmark functionality)');
+    logger.log('  - /api/shares (Share tracking)');
+    logger.log('  - /api/series (Story series)');
+    logger.log('  - /api/health (Health check)');
+  } else {
+    console.log(`Server is running on port ${PORT}`);
+  }
 });

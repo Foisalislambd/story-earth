@@ -1,6 +1,8 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+const logger = require('../utils/logger');
+
 const sequelize = new Sequelize(
   process.env.DATABASE_URL || {
     database: process.env.DB_NAME || 'story_sharing',
@@ -22,15 +24,16 @@ const sequelize = new Sequelize(
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('Connected to PostgreSQL database successfully.');
+    
+    logger.log('Connected to PostgreSQL database successfully.');
     
     // Sync database in development
     if (process.env.NODE_ENV === 'development') {
       await sequelize.sync({ alter: true });
-      console.log('Database synchronized.');
+      logger.log('Database synchronized.');
     }
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    logger.error('Unable to connect to the database:', error);
     process.exit(1);
   }
 };

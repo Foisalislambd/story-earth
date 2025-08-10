@@ -2,6 +2,7 @@ const express = require('express');
 const { Op } = require('sequelize');
 const { Story, User, Like, Comment } = require('../models');
 const auth = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -63,7 +64,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get stories error:', error);
+    logger.error('Get stories error:', error);
     res.status(500).json({
       error: { message: 'Server error fetching stories' }
     });
@@ -111,7 +112,7 @@ router.get('/:slug', async (req, res) => {
 
     res.json({ story });
   } catch (error) {
-    console.error('Get story error:', error);
+    logger.error('Get story error:', error);
     res.status(500).json({
       error: { message: 'Server error fetching story' }
     });
@@ -154,7 +155,7 @@ router.post('/', auth, async (req, res) => {
       story: storyWithAuthor
     });
   } catch (error) {
-    console.error('Create story error:', error);
+    logger.error('Create story error:', error);
     
     if (error.name === 'SequelizeValidationError') {
       const messages = error.errors.map(err => err.message);
@@ -223,7 +224,7 @@ router.put('/:id', auth, async (req, res) => {
       story: updatedStory
     });
   } catch (error) {
-    console.error('Update story error:', error);
+    logger.error('Update story error:', error);
     
     if (error.name === 'SequelizeValidationError') {
       const messages = error.errors.map(err => err.message);
@@ -266,7 +267,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.json({ message: 'Story deleted successfully' });
   } catch (error) {
-    console.error('Delete story error:', error);
+    logger.error('Delete story error:', error);
     res.status(500).json({
       error: { message: 'Server error deleting story' }
     });
@@ -300,7 +301,7 @@ router.post('/:id/like', auth, async (req, res) => {
       res.json({ message: 'Story liked', liked: true });
     }
   } catch (error) {
-    console.error('Like story error:', error);
+    logger.error('Like story error:', error);
     res.status(500).json({
       error: { message: 'Server error processing like' }
     });
@@ -344,7 +345,7 @@ router.post('/:id/comments', auth, async (req, res) => {
       comment: commentWithAuthor
     });
   } catch (error) {
-    console.error('Add comment error:', error);
+    logger.error('Add comment error:', error);
     
     if (error.name === 'SequelizeValidationError') {
       const messages = error.errors.map(err => err.message);
@@ -382,7 +383,7 @@ router.get('/user/my-stories', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get user stories error:', error);
+    logger.error('Get user stories error:', error);
     res.status(500).json({
       error: { message: 'Server error fetching user stories' }
     });

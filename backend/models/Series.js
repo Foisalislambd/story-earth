@@ -109,10 +109,8 @@ Series.associate = (models) => {
     as: 'stories'
   });
 
-  Series.hasMany(models.SeriesFollower, {
-    foreignKey: 'seriesId',
-    as: 'followers'
-  });
+  // Note: SeriesFollower model association removed as the model doesn't exist yet
+  // This can be added back when the SeriesFollower model is created
 };
 
 module.exports = Series;

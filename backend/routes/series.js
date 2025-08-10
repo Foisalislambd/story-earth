@@ -2,6 +2,7 @@ const express = require('express');
 const { Op } = require('sequelize');
 const { Series, Story, User } = require('../models');
 const auth = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -74,7 +75,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching series:', error);
+    logger.error('Error fetching series:', error);
     res.status(500).json({ message: 'Error fetching series' });
   }
 });
@@ -120,7 +121,7 @@ router.get('/:slug', async (req, res) => {
 
     res.json(series);
   } catch (error) {
-    console.error('Error fetching series:', error);
+    logger.error('Error fetching series:', error);
     res.status(500).json({ message: 'Error fetching series' });
   }
 });
@@ -168,7 +169,7 @@ router.post('/', auth, async (req, res) => {
 
     res.status(201).json(seriesWithAuthor);
   } catch (error) {
-    console.error('Error creating series:', error);
+    logger.error('Error creating series:', error);
     res.status(500).json({ message: 'Error creating series' });
   }
 });
@@ -229,7 +230,7 @@ router.put('/:id', auth, async (req, res) => {
 
     res.json(updatedSeries);
   } catch (error) {
-    console.error('Error updating series:', error);
+    logger.error('Error updating series:', error);
     res.status(500).json({ message: 'Error updating series' });
   }
 });
@@ -263,7 +264,7 @@ router.delete('/:id', auth, async (req, res) => {
 
     res.json({ message: 'Series deleted successfully' });
   } catch (error) {
-    console.error('Error deleting series:', error);
+    logger.error('Error deleting series:', error);
     res.status(500).json({ message: 'Error deleting series' });
   }
 });
@@ -308,7 +309,7 @@ router.get('/user/my-series', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching user series:', error);
+    logger.error('Error fetching user series:', error);
     res.status(500).json({ message: 'Error fetching user series' });
   }
 });
@@ -381,7 +382,7 @@ router.post('/:id/stories', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error adding story to series:', error);
+    logger.error('Error adding story to series:', error);
     res.status(500).json({ message: 'Error adding story to series' });
   }
 });
@@ -429,7 +430,7 @@ router.delete('/:id/stories/:storyId', auth, async (req, res) => {
 
     res.json({ message: 'Story removed from series successfully' });
   } catch (error) {
-    console.error('Error removing story from series:', error);
+    logger.error('Error removing story from series:', error);
     res.status(500).json({ message: 'Error removing story from series' });
   }
 });
@@ -466,7 +467,7 @@ router.put('/:id/reorder', auth, async (req, res) => {
 
     res.json({ message: 'Series order updated successfully' });
   } catch (error) {
-    console.error('Error reordering series:', error);
+    logger.error('Error reordering series:', error);
     res.status(500).json({ message: 'Error reordering series' });
   }
 });
