@@ -1,6 +1,7 @@
 const express = require('express');
 const { Share, Story, User } = require('../models');
 const auth = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -51,7 +52,7 @@ router.post('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error recording share:', error);
+    logger.error('Error recording share:', error);
     res.status(500).json({ message: 'Error recording share' });
   }
 });
@@ -104,7 +105,7 @@ router.get('/story/:storyId/stats', async (req, res) => {
       recentShares
     });
   } catch (error) {
-    console.error('Error fetching share stats:', error);
+    logger.error('Error fetching share stats:', error);
     res.status(500).json({ message: 'Error fetching share statistics' });
   }
 });
@@ -147,7 +148,7 @@ router.get('/user/history', auth, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching user share history:', error);
+    logger.error('Error fetching user share history:', error);
     res.status(500).json({ message: 'Error fetching share history' });
   }
 });
@@ -209,7 +210,7 @@ router.get('/trending', async (req, res) => {
 
     res.json({ trendingStories });
   } catch (error) {
-    console.error('Error fetching trending stories:', error);
+    logger.error('Error fetching trending stories:', error);
     res.status(500).json({ message: 'Error fetching trending stories' });
   }
 });
@@ -305,7 +306,7 @@ router.get('/analytics', auth, async (req, res) => {
       timeframe
     });
   } catch (error) {
-    console.error('Error fetching share analytics:', error);
+    logger.error('Error fetching share analytics:', error);
     res.status(500).json({ message: 'Error fetching share analytics' });
   }
 });

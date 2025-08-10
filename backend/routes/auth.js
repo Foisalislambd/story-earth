@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const { User } = require('../models');
 const auth = require('../middleware/auth');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -49,7 +50,7 @@ router.post('/register', async (req, res) => {
       token
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    logger.error('Registration error:', error);
     
     if (error.name === 'SequelizeValidationError') {
       const messages = error.errors.map(err => err.message);
@@ -106,7 +107,7 @@ router.post('/login', async (req, res) => {
       token
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error('Login error:', error);
     res.status(500).json({
       error: { message: 'Server error during login' }
     });
@@ -131,7 +132,7 @@ router.get('/me', auth, async (req, res) => {
 
     res.json({ user });
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error:', error);
     res.status(500).json({
       error: { message: 'Server error fetching profile' }
     });
@@ -165,7 +166,7 @@ router.put('/profile', auth, async (req, res) => {
       user: req.user
     });
   } catch (error) {
-    console.error('Update profile error:', error);
+    logger.error('Update profile error:', error);
     
     if (error.name === 'SequelizeValidationError') {
       const messages = error.errors.map(err => err.message);
@@ -210,7 +211,7 @@ router.post('/follow/:userId', auth, async (req, res) => {
       res.json({ message: 'User followed successfully', following: true });
     }
   } catch (error) {
-    console.error('Follow/unfollow error:', error);
+    logger.error('Follow/unfollow error:', error);
     res.status(500).json({
       error: { message: 'Server error during follow/unfollow' }
     });
@@ -242,7 +243,7 @@ router.get('/user/:username', async (req, res) => {
 
     res.json({ user });
   } catch (error) {
-    console.error('Get user error:', error);
+    logger.error('Get user error:', error);
     res.status(500).json({
       error: { message: 'Server error fetching user' }
     });

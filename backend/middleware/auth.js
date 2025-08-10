@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { User } = require('../models');
+const logger = require('../utils/logger');
 
 const auth = async (req, res, next) => {
   try {
@@ -34,7 +35,7 @@ const auth = async (req, res, next) => {
       });
     }
     
-    console.error('Auth middleware error:', error);
+    logger.error('Auth middleware error:', error);
     res.status(500).json({ 
       error: { message: 'Server error during authentication.' } 
     });
