@@ -1,77 +1,118 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
+const { sequelize } = require('../config/database');
 
-const userSchema = new mongoose.Schema({
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   username: {
-    type: String,
-    required: [true, 'Username is required'],
+    type: DataTypes.STRING(20),
+    allowNull: false,
     unique: true,
-    trim: true,
-    minlength: [3, 'Username must be at least 3 characters long'],
-    maxlength: [20, 'Username must be less than 20 characters'],
-    match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores']
+    validate: {
+      notEmpty: { msg: 'Username is required' },
+      len: {
+        args: [3, 20],
+        msg: 'Username must be between 3 and 20 characters'
+      },
+      is: {
+        args: /^[a-zA-Z0-9_]+$/,
+        msg: 'Username can only contain letters, numbers, and underscores'
+      }
+    }
   },
   email: {
-    type: String,
-    required: [true, 'Email is required'],
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email']
+    validate: {
+      notEmpty: { msg: 'Email is required' },
+      isEmail: { msg: 'Please provide a valid email' }
+    },
+    set(value) {
+      this.setDataValue('email', value.toLowerCase());
+    }
   },
   password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters long']
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: { msg: 'Password is required' },
+      len: {
+        args: [6, 255],
+        msg: 'Password must be at least 6 characters long'
+      }
+    }
   },
   avatar: {
-    type: String,
-    default: ''
+    type: DataTypes.TEXT,
+    defaultValue: ''
   },
   bio: {
-    type: String,
-    maxlength: [500, 'Bio must be less than 500 characters'],
-    default: ''
+    type: DataTypes.TEXT,
+    defaultValue: '',
+    validate: {
+      len: {
+        args: [0, 500],
+        msg: 'Bio must be less than 500 characters'
+      }
+    }
   },
-  followers: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
-  following: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
   storiesCount: {
-    type: Number,
-    default: 0
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   }
 }, {
-  timestamps: true
-});
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
+  timestamps: true,
+  hooks: {
+    beforeSave: async (user) => {
+      if (user.changed('password')) {
+        const salt = await bcrypt.genSalt(12);
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+    }
+  },
+  defaultScope: {
+    attributes: { exclude: ['password'] }
+  },
+  scopes: {
+    withPassword: {
+      attributes: { include: ['password'] }
+    }
   }
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
+// Instance method to compare passwords
+User.prototype.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON output
-userSchema.methods.toJSON = function() {
-  const user = this.toObject();
-  delete user.password;
-  return user;
+// Define associations
+User.associate = (models) => {
+  // Self-referencing many-to-many for followers/following
+  User.belongsToMany(models.User, {
+    through: 'UserFollowers',
+    as: 'Followers',
+    foreignKey: 'followingId',
+    otherKey: 'followerId'
+  });
+  
+  User.belongsToMany(models.User, {
+    through: 'UserFollowers',
+    as: 'Following',
+    foreignKey: 'followerId',
+    otherKey: 'followingId'
+  });
+  
+  // User has many stories
+  User.hasMany(models.Story, {
+    foreignKey: 'authorId',
+    as: 'stories'
+  });
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = User;
