@@ -2,12 +2,26 @@ const User = require('./User');
 const Story = require('./Story');
 const Like = require('./Like');
 const Comment = require('./Comment');
+const Bookmark = require('./Bookmark');
+const Share = require('./Share');
+const Series = require('./Series');
+const ReadingProgress = require('./ReadingProgress');
+const Follow = require('./Follow');
+const Notification = require('./Notification');
+const Report = require('./Report');
 
 const models = {
   User,
   Story,
   Like,
-  Comment
+  Comment,
+  Bookmark,
+  Share,
+  Series,
+  ReadingProgress,
+  Follow,
+  Notification,
+  Report
 };
 
 // Initialize associations

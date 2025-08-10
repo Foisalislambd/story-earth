@@ -42,6 +42,10 @@ const Story = sequelize.define('Story', {
     type: DataTypes.TEXT,
     allowNull: true
   },
+  images: {
+    type: DataTypes.ARRAY(DataTypes.TEXT),
+    defaultValue: []
+  },
   tags: {
     type: DataTypes.ARRAY(DataTypes.STRING),
     defaultValue: []
@@ -60,7 +64,19 @@ const Story = sequelize.define('Story', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+  isDraft: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  visibility: {
+    type: DataTypes.ENUM('public', 'unlisted', 'private'),
+    defaultValue: 'public'
+  },
   publishedAt: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  scheduledAt: {
     type: DataTypes.DATE,
     allowNull: true
   },
@@ -76,8 +92,48 @@ const Story = sequelize.define('Story', {
     type: DataTypes.INTEGER,
     defaultValue: 0
   },
+  sharesCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
+  bookmarksCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
+  },
   readingTime: {
     type: DataTypes.INTEGER, // in minutes
+    allowNull: true
+  },
+  contentType: {
+    type: DataTypes.ENUM('story', 'poem', 'article', 'review'),
+    defaultValue: 'story'
+  },
+  language: {
+    type: DataTypes.STRING(5),
+    defaultValue: 'en'
+  },
+  mature: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  allowComments: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  allowSharing: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  seriesId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'Series',
+      key: 'id'
+    }
+  },
+  partNumber: {
+    type: DataTypes.INTEGER,
     allowNull: true
   },
   authorId: {
@@ -87,6 +143,14 @@ const Story = sequelize.define('Story', {
       model: 'Users',
       key: 'id'
     }
+  },
+  collaborators: {
+    type: DataTypes.ARRAY(DataTypes.UUID),
+    defaultValue: []
+  },
+  metadata: {
+    type: DataTypes.JSONB,
+    defaultValue: {}
   }
 }, {
   timestamps: true,
@@ -116,6 +180,11 @@ const Story = sequelize.define('Story', {
       if (story.isPublished && !story.publishedAt) {
         story.publishedAt = new Date();
       }
+      
+      // Update draft status
+      if (story.isPublished) {
+        story.isDraft = false;
+      }
     }
   },
   indexes: [
@@ -123,7 +192,12 @@ const Story = sequelize.define('Story', {
     { fields: ['isPublished'] },
     { fields: ['publishedAt'] },
     { fields: ['category'] },
-    { fields: ['tags'], using: 'gin' }
+    { fields: ['tags'], using: 'gin' },
+    { fields: ['visibility'] },
+    { fields: ['contentType'] },
+    { fields: ['seriesId'] },
+    { fields: ['collaborators'], using: 'gin' },
+    { fields: ['metadata'], using: 'gin' }
   ]
 });
 
@@ -145,6 +219,39 @@ Story.associate = (models) => {
   Story.hasMany(models.Comment, {
     foreignKey: 'storyId',
     as: 'comments'
+  });
+
+  // Story has many bookmarks
+  Story.hasMany(models.Bookmark, {
+    foreignKey: 'storyId',
+    as: 'bookmarks'
+  });
+
+  // Story has many shares
+  Story.hasMany(models.Share, {
+    foreignKey: 'storyId',
+    as: 'shares'
+  });
+
+  // Story belongs to Series (optional)
+  Story.belongsTo(models.Series, {
+    foreignKey: 'seriesId',
+    as: 'series'
+  });
+
+  // Story has many reading progress records
+  Story.hasMany(models.ReadingProgress, {
+    foreignKey: 'storyId',
+    as: 'readingProgress'
+  });
+
+  // Story has many reports
+  Story.hasMany(models.Report, {
+    foreignKey: 'contentId',
+    as: 'reports',
+    scope: {
+      contentType: 'story'
+    }
   });
 };
 
